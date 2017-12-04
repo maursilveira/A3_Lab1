@@ -2,34 +2,53 @@
   'use strict';
 
   var cars = document.querySelectorAll('.data-ref');
-  var model = document.querySelector('.modelName');
-  var price = document.querySelector('.priceInfo');
-  var details = document.querySelector('.modelDetails');
+  const httpRequest = new XMLHttpRequest();
 
-  function openFirst() {
-    this.classList.add('selected');
-    loadContent(0);
-  }
+  function processRequest() {
+   let reqIndicator = document.querySelector('.request-state');
+   reqIndicator.textContent = httpRequest.readyState;
 
-  function showModelDetails(evt) {
-    for (let i = 0; i < cars.length; i++) {
-      cars[i].classList.remove('selected');
+   if (httpRequest.readyState === XMLHttpRequest.DONE) {
+     if (httpRequest.status === 200) { // 200 means everything is awesome
+      //  debugger;
+      let data = JSON.parse(httpRequest.responseText);
+      processResult(data);
+     }
+     else {
+       alert('There was a problem with the request.');
+     }
     }
-    evt.currentTarget.classList.add('selected');
-    let index = evt.currentTarget.dataset.roundaboutindex
-    loadContent(index);
   }
 
-  function loadContent(index) {
-    model.innerHTML = carData.model[index];
-    price.innerHTML = carData.price[index];
-    details.innerHTML = carData.detail[index];
+  function processResult(data) {
+    const {modelName, pricing, modelDetails} = data;
+
+    let model = document.querySelector('.modelName').textContent = modelName;
+    let price = document.querySelector('.priceInfo').textContent = pricing;
+    let desc = document.querySelector('.modelDetails').textContent = modelDetails;
+
+    cars.forEach(function(car, index) {
+      car.classList.add('nonActive');
+    });
+
+    document.querySelector(`#${data.model}`).classList.remove('nonActive');
   }
 
-  openFirst.call(document.querySelector('.data-ref'));
+  function getCarData() {
+    if (!httpRequest) {
+      alert('browser fail');
+      return false;
+    }
 
-  for (let i = 0; i < cars.length; i++) {
-    cars[i].addEventListener('click', showModelDetails, false);
+    httpRequest.onreadystatechange = processRequest;
+    httpRequest.open('GET', './includes/functions.php?carModel='+this.id);
+    httpRequest.send();
   }
+
+  getCarData.call(document.querySelector('.data-ref'));
+
+  cars.forEach(function(car, index) {
+    car.addEventListener('click', getCarData, false);
+  });
 
 })();
