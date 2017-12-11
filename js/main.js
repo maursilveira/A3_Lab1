@@ -2,7 +2,7 @@
   'use strict';
 
   var cars = document.querySelectorAll('.data-ref');
-  const httpRequest = new XMLHttpRequest();
+  // const httpRequest = new XMLHttpRequest();
 
   // function processRequest() {
   //  let reqIndicator = document.querySelector('.request-state');
@@ -20,19 +20,19 @@
   //   }
   // }
 
-  function processResult(data) {
-    const {modelName, pricing, modelDetails} = data;
-
-    let model = document.querySelector('.modelName').textContent = modelName;
-    let price = document.querySelector('.priceInfo').textContent = pricing;
-    let desc = document.querySelector('.modelDetails').textContent = modelDetails;
-
-    cars.forEach(function(car, index) {
-      car.classList.add('nonActive');
-    });
-
-    document.querySelector(`#${data.model}`).classList.remove('nonActive');
-  }
+  // function processResult(data) {
+  //   const {modelName, pricing, modelDetails} = data;
+  //
+  //   let model = document.querySelector('.modelName').textContent = modelName;
+  //   let price = document.querySelector('.priceInfo').textContent = pricing;
+  //   let desc = document.querySelector('.modelDetails').textContent = modelDetails;
+  //
+  //   cars.forEach(function(car, index) {
+  //     car.classList.add('nonActive');
+  //   });
+  //
+  //   document.querySelector(`#${data.model}`).classList.remove('nonActive');
+  // }
 
   // function getCarData() {
   //   if (!httpRequest) {
@@ -50,7 +50,18 @@
 
     fetch(url) // do an ajax call with fetch
       .then((resp) => resp.json()) // convert to json
-      .then((data) => { processResult(data);}) // call the process function
+      .then(({modelName, pricing, modelDetails, model}) => {
+        let carmodel = document.querySelector('.modelName').textContent = modelName;
+        let price = document.querySelector('.priceInfo').textContent = pricing;
+        let desc = document.querySelector('.modelDetails').textContent = modelDetails;
+
+        console.log(model);
+        cars.forEach(function(car, index) {
+          car.classList.add('nonActive');
+        });
+
+        document.querySelector(`#${model}`).classList.remove('nonActive');
+      }) // call the process function
       .catch(function(error) {
         console.log(error);
       });
